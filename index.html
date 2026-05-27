@@ -1,0 +1,2839 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NX Tweaker — PUBG Mods Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+        rel="stylesheet" media="all" onload="this.media='all'">
+    <noscript>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet">
+    </noscript>
+    <style>
+        :root {
+            --bg: #020617;
+            --glass: rgba(15, 23, 42, 0.96);
+            --text: #f8fafc;
+            --muted: #e5e7eb;
+            --accent-1: #60a5fa;
+            --accent-2: #a78bfa;
+            --accent-3: #22d3ee;
+            --ring: rgba(59, 130, 246, 0.9);
+            --shadow-1: rgba(15, 23, 42, 0.9);
+            --shadow-2: rgba(0, 0, 0, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+            background: #030712;
+            color: #fff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            height: 100vh;
+            transition: background 0.5s ease;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(99, 102, 241, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(99, 102, 241, 0.03) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body.dashboard-open {
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            min-height: 100vh;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body.about-modal-open {
+            overflow: hidden;
+        }
+
+        body.risk-modal-open {
+            overflow: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: -10%;
+            pointer-events: none;
+            z-index: -1;
+            background:
+                radial-gradient(70vw 50vh at 15% 12%, rgba(99, 102, 241, 0.12), transparent 60%),
+                radial-gradient(60vw 45vh at 85% 88%, rgba(34, 211, 238, 0.1), transparent 60%),
+                radial-gradient(50vw 35vh at 50% 50%, rgba(167, 139, 250, 0.07), transparent 60%);
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* === Floating Orbs Background === */
+        .welcome-orbs {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .welcome-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.45;
+            animation: orbFloat 8s ease-in-out infinite alternate;
+        }
+
+        .welcome-orb:nth-child(1) {
+            width: 340px;
+            height: 340px;
+            top: -8%;
+            left: -5%;
+            background: rgba(99, 102, 241, 0.5);
+            animation-duration: 10s;
+        }
+
+        .welcome-orb:nth-child(2) {
+            width: 280px;
+            height: 280px;
+            bottom: -6%;
+            right: -4%;
+            background: rgba(34, 211, 238, 0.45);
+            animation-duration: 12s;
+            animation-delay: -3s;
+        }
+
+        .welcome-orb:nth-child(3) {
+            width: 200px;
+            height: 200px;
+            top: 40%;
+            left: 55%;
+            background: rgba(167, 139, 250, 0.4);
+            animation-duration: 9s;
+            animation-delay: -5s;
+        }
+
+        @keyframes orbFloat {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            100% {
+                transform: translate(30px, -40px) scale(1.15);
+            }
+        }
+
+        #welcome {
+            text-align: center;
+            display: block;
+            padding: 52px 44px 44px;
+            border-radius: 32px;
+            background: linear-gradient(165deg, rgba(12, 18, 40, 0.96), rgba(4, 8, 24, 0.94));
+            box-shadow:
+                0 0 0 1px rgba(99, 102, 241, 0.3),
+                0 0 120px -20px rgba(99, 102, 241, 0.35),
+                0 0 60px -30px rgba(167, 139, 250, 0.25),
+                0 30px 80px -10px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            backdrop-filter: blur(40px) saturate(180%);
+            max-width: 520px;
+            width: min(92vw, 520px);
+            position: relative;
+            z-index: 1;
+            animation: welcomeCardIn 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            opacity: 0;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            #welcome {
+                animation: none !important;
+                opacity: 1 !important;
+            }
+
+            .welcome-logo,
+            .welcome-badge,
+            #welcome h1,
+            #welcome p,
+            .btn,
+            .social-links {
+                animation: none !important;
+                opacity: 1 !important;
+                transform: none !important;
+            }
+        }
+
+        @keyframes welcomeCardIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.94);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        #welcome::before {
+            content: "";
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 160px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, #818cf8, #a78bfa, #22d3ee, transparent);
+            box-shadow: 0 0 20px rgba(129, 140, 248, 0.8);
+        }
+
+        #welcome::after {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 32px;
+            pointer-events: none;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent 40%, transparent 60%, rgba(34, 211, 238, 0.12));
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            padding: 1px;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* NX Logo Icon */
+        .welcome-logo {
+            width: 72px;
+            height: 72px;
+            margin: 0 auto 20px;
+            position: relative;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+        }
+
+        .welcome-logo-ring {
+            position: absolute;
+            inset: -6px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            background: linear-gradient(135deg, var(--accent-1), var(--accent-2)) border-box;
+            mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+            mask-composite: exclude;
+            -webkit-mask-composite: xor;
+            padding: 2px;
+            animation: logoSpin 6s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes logoSpin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .welcome-logo-inner {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.15));
+            box-shadow: inset 0 0 20px rgba(99, 102, 241, 0.15), 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .welcome-logo-inner svg {
+            width: 32px;
+            height: 32px;
+            fill: url(#nxGrad);
+        }
+
+        @keyframes welcomeElIn {
+            from {
+                opacity: 0;
+                transform: translateY(18px) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .welcome-badge {
+            display: inline-block;
+            padding: 5px 16px;
+            border-radius: 999px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.7em;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-3);
+            background: rgba(34, 211, 238, 0.08);
+            border: 1px solid rgba(34, 211, 238, 0.25);
+            margin-bottom: 14px;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.25s both;
+        }
+
+        #welcome h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.9em;
+            font-weight: 800;
+            margin-bottom: 10px;
+            letter-spacing: 0.05em;
+            line-height: 1.25;
+            background: linear-gradient(135deg, #f8fafc 30%, var(--accent-1) 60%, var(--accent-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+        }
+
+        #welcome p {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95em;
+            margin-bottom: 28px;
+            color: #94a3b8;
+            line-height: 1.7;
+            max-width: 380px;
+            margin-left: auto;
+            margin-right: auto;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.45s both;
+        }
+
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.65s both;
+        }
+
+        .social-link {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(148, 163, 184, 0.15);
+            color: var(--text);
+            text-decoration: none;
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease, border-color 0.25s ease;
+            backdrop-filter: blur(8px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .social-link svg {
+            width: 20px;
+            height: 20px;
+            fill: #e2e8f0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .social-link-discord {
+            background: linear-gradient(135deg, rgba(88, 101, 242, 0.2), rgba(88, 101, 242, 0.08));
+            border-color: rgba(88, 101, 242, 0.3);
+        }
+
+        .social-link-discord:hover {
+            box-shadow: 0 8px 28px rgba(88, 101, 242, 0.35);
+            border-color: rgba(88, 101, 242, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .social-link-tiktok {
+            background: linear-gradient(135deg, rgba(255, 0, 80, 0.15), rgba(0, 242, 234, 0.1));
+            border-color: rgba(255, 0, 80, 0.25);
+        }
+
+        .social-link-tiktok:hover {
+            box-shadow: 0 8px 28px rgba(255, 0, 80, 0.3), 0 0 12px rgba(0, 242, 234, 0.2);
+            border-color: rgba(255, 0, 80, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .social-link-telegram {
+            background: linear-gradient(135deg, rgba(42, 171, 238, 0.2), rgba(42, 171, 238, 0.08));
+            border-color: rgba(42, 171, 238, 0.3);
+        }
+
+        .social-link-telegram:hover {
+            box-shadow: 0 8px 28px rgba(42, 171, 238, 0.35);
+            border-color: rgba(42, 171, 238, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .social-link-instagram {
+            background: linear-gradient(135deg, rgba(225, 48, 108, 0.2), rgba(225, 48, 108, 0.08));
+            border-color: rgba(225, 48, 108, 0.3);
+        }
+
+        .social-link-instagram:hover {
+            box-shadow: 0 8px 28px rgba(225, 48, 108, 0.35);
+            border-color: rgba(225, 48, 108, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .social-link-youtube {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(255, 0, 0, 0.08));
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+
+        .social-link-youtube:hover {
+            box-shadow: 0 8px 28px rgba(255, 0, 0, 0.35);
+            border-color: rgba(255, 0, 0, 0.6);
+            transform: translateY(-3px);
+        }
+
+        .social-link:focus-visible {
+            outline: none;
+            transform: translateY(-2px);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.5);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #6366f1, #06b6d4);
+            border: none;
+            color: #fff;
+            padding: 15px 36px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.85em;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 16px;
+            letter-spacing: 0.1em;
+            position: relative;
+            overflow: hidden;
+            will-change: transform;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 8px 30px rgba(99, 102, 241, 0.3), 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.25s ease;
+            animation: welcomeElIn 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.55s both;
+        }
+
+        .btn::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            animation: btnShimmer 3s ease-in-out infinite;
+        }
+
+        @keyframes btnShimmer {
+            0% {
+                left: -100%;
+            }
+
+            50%,
+            100% {
+                left: 100%;
+            }
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 14px 40px rgba(99, 102, 241, 0.4), 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.45), 0 14px 40px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn svg {
+            width: 16px;
+            height: 16px;
+            fill: #fff;
+        }
+
+        /* Main Dashboard */
+        /* Main Dashboard */
+        #dashboard {
+            display: none;
+            flex-direction: row;
+            align-items: stretch;
+            width: min(96vw, 1160px);
+            height: min(90vh, 840px);
+            animation: dashIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            border-radius: 28px;
+            background: linear-gradient(145deg, rgba(10, 16, 35, 0.98), rgba(3, 7, 20, 0.97));
+            box-shadow:
+                0 0 0 1px rgba(99, 102, 241, 0.25),
+                0 0 80px -10px rgba(99, 102, 241, 0.18),
+                0 40px 100px rgba(0, 0, 0, 0.8),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            -webkit-backdrop-filter: blur(40px) saturate(160%);
+            backdrop-filter: blur(40px) saturate(160%);
+            overflow: hidden;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        #dashboard::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(60vw 40vh at 15% 10%, rgba(99, 102, 241, 0.07), transparent 60%),
+                radial-gradient(50vw 35vh at 90% 85%, rgba(34, 211, 238, 0.06), transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        @keyframes dashIn {
+            from {
+                opacity: 0;
+                transform: scale(0.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .dash-sidebar {
+            width: 240px;
+            flex-shrink: 0;
+            padding: 24px 16px;
+            background: linear-gradient(180deg, rgba(8, 13, 30, 0.99), rgba(3, 7, 20, 0.98));
+            border-right: 1px solid transparent;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dash-sidebar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.5) 30%, rgba(34, 211, 238, 0.35) 70%, transparent);
+        }
+
+        .dash-brand {
+            padding: 12px 12px 16px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.15);
+            position: relative;
+        }
+
+        .dash-brand-tag {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.62em;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--accent-3);
+            margin-bottom: 6px;
+            opacity: 0.8;
+        }
+
+        .dash-brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4em;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            background: linear-gradient(135deg, #ffffff 20%, #93c5fd 55%, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            line-height: 1.2;
+            filter: drop-shadow(0 0 12px rgba(99, 102, 241, 0.4));
+        }
+
+        .dash-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .dash-nav-btn span.nav-cat-label {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.68em;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+        }
+
+        .dash-nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid transparent;
+            background: transparent;
+            color: #475569;
+            font-size: 0.92em;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dash-nav-btn::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 3px;
+            height: 0;
+            border-radius: 999px;
+            background: linear-gradient(180deg, var(--accent-1), var(--accent-2));
+            transition: height 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .dash-nav-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            flex-shrink: 0;
+            opacity: 0.6;
+            transition: all 0.25s ease;
+        }
+
+        .dash-nav-btn:hover {
+            background: rgba(99, 102, 241, 0.08);
+            border-color: rgba(99, 102, 241, 0.15);
+            color: #c7d2fe;
+        }
+
+        .dash-nav-btn:hover svg {
+            opacity: 1;
+        }
+
+        .dash-nav-btn:hover::before {
+            height: 60%;
+        }
+
+        .dash-nav-btn.active {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(34, 211, 238, 0.1));
+            border-color: rgba(99, 102, 241, 0.4);
+            color: #e0f2fe;
+            box-shadow: 0 4px 20px -4px rgba(99, 102, 241, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+
+        .dash-nav-btn.active::before {
+            height: 70%;
+        }
+
+        .dash-nav-btn.active svg {
+            opacity: 1;
+            filter: drop-shadow(0 0 6px rgba(99, 102, 241, 0.7));
+        }
+
+        .dash-sidebar-spacer {
+            flex: 1;
+            min-height: 8px;
+        }
+
+        .dash-about-foot {
+            padding-top: 6px;
+            border-top: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .btn-about {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(148, 163, 184, 0.1);
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.4), rgba(15, 23, 42, 0.3));
+            color: #64748b;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.84em;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .btn-about svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+            opacity: 0.9;
+            flex-shrink: 0;
+        }
+
+        .btn-about:hover {
+            background: rgba(51, 65, 85, 0.55);
+            border-color: rgba(148, 163, 184, 0.45);
+            color: #f1f5f9;
+        }
+
+        .btn-about:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.45);
+        }
+
+        .about-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 22px 16px;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.28s ease, visibility 0.28s ease;
+        }
+
+        .about-modal.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .about-modal-backdrop {
+            position: absolute;
+            inset: 0;
+            background: rgba(2, 6, 23, 0.78);
+            backdrop-filter: blur(10px);
+        }
+
+        .about-modal-panel {
+            position: relative;
+            z-index: 1;
+            width: min(100%, 380px);
+            max-height: min(88vh, 520px);
+            overflow-y: auto;
+            padding: 22px 20px 20px;
+            border-radius: 20px;
+            background: linear-gradient(165deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.99));
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            box-shadow: 0 28px 70px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(56, 189, 248, 0.08);
+        }
+
+        .about-modal-panel::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 48px;
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            opacity: 0.75;
+        }
+
+        .about-modal-close {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 34px;
+            height: 34px;
+            border: none;
+            border-radius: 10px;
+            background: rgba(15, 23, 42, 0.75);
+            color: #94a3b8;
+            font-size: 1.35rem;
+            line-height: 1;
+            cursor: pointer;
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+
+        .about-modal-close:hover {
+            background: rgba(51, 65, 85, 0.85);
+            color: #f1f5f9;
+        }
+
+        .about-modal-close:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+        }
+
+        .about-modal-title {
+            margin: 8px 42px 12px;
+            font-size: 1.22em;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-align: center;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .about-modal-text {
+            margin: 0 0 22px;
+            font-size: 0.94em;
+            line-height: 1.65;
+            color: #cbd5e1;
+            text-align: center;
+        }
+
+        .about-modal-links {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            padding: 4px 0 2px;
+        }
+
+        .about-modal-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 54px;
+            height: 54px;
+            padding: 0;
+            border-radius: 16px;
+            text-decoration: none;
+            color: #f8fafc;
+            border: 1px solid rgba(148, 163, 184, 0.22);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease, border-color 0.2s ease;
+        }
+
+        .about-modal-link svg {
+            width: 26px;
+            height: 26px;
+            fill: currentColor;
+            flex-shrink: 0;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+        }
+
+        .about-modal-link:hover {
+            transform: translateY(-3px) scale(1.04);
+            filter: brightness(1.08);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .about-modal-link:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .about-modal-link:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.45), 0 8px 22px rgba(0, 0, 0, 0.45);
+        }
+
+        .about-modal-discord {
+            background: linear-gradient(145deg, rgba(99, 102, 241, 0.95), rgba(79, 70, 229, 0.75));
+            border-color: rgba(165, 180, 252, 0.55);
+        }
+
+        .about-modal-telegram {
+            background: linear-gradient(145deg, rgba(14, 165, 233, 0.9), rgba(37, 99, 235, 0.82));
+            border-color: rgba(125, 211, 252, 0.45);
+        }
+
+        .about-modal-tiktok {
+            background: linear-gradient(145deg, rgba(244, 63, 94, 0.85), rgba(15, 23, 42, 0.92));
+            border-color: rgba(251, 113, 133, 0.45);
+        }
+
+        .about-modal-tiktok svg {
+            margin-top: 1px;
+        }
+
+        .about-modal-instagram {
+            background: linear-gradient(145deg, rgba(225, 48, 108, 0.9), rgba(253, 29, 29, 0.8));
+            border-color: rgba(251, 113, 133, 0.45);
+        }
+
+        .about-modal-youtube {
+            background: linear-gradient(145deg, rgba(255, 0, 0, 0.9), rgba(153, 0, 0, 0.8));
+            border-color: rgba(252, 165, 165, 0.45);
+        }
+
+        #risk-modal .about-modal-backdrop {
+            background: rgba(0, 0, 0, 0.92);
+            backdrop-filter: blur(20px) saturate(120%);
+        }
+
+        .risk-modal-panel {
+            width: min(100%, 540px);
+            border-radius: 28px;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            background: linear-gradient(160deg, rgba(20, 5, 5, 0.99), rgba(10, 5, 20, 0.99));
+            box-shadow:
+                0 0 0 1px rgba(239, 68, 68, 0.15),
+                0 0 80px -10px rgba(239, 68, 68, 0.3),
+                0 40px 100px rgba(0, 0, 0, 0.9),
+                inset 0 1px 0 rgba(255, 100, 100, 0.08);
+            padding: 36px 30px 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .risk-modal-panel::before {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, #ef4444, #f97316, transparent);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.8);
+        }
+
+        .risk-modal-panel::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(60% 40% at 50% 0%, rgba(239, 68, 68, 0.1), transparent 70%),
+                radial-gradient(40% 30% at 10% 90%, rgba(249, 115, 22, 0.07), transparent 60%);
+            pointer-events: none;
+        }
+
+        .risk-modal-icon {
+            width: 88px;
+            height: 88px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 40% 30%, rgba(255, 100, 100, 0.25), rgba(239, 68, 68, 0.1));
+            border: 1px solid rgba(239, 68, 68, 0.5);
+            box-shadow:
+                inset 0 0 30px rgba(239, 68, 68, 0.2),
+                0 0 40px -10px rgba(239, 68, 68, 0.5),
+                0 16px 40px rgba(0, 0, 0, 0.6);
+            animation: riskPulse 2.5s ease-in-out infinite;
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-modal-icon svg {
+            width: 44px;
+            height: 44px;
+            fill: #fca5a5;
+            filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.7));
+        }
+
+        @keyframes riskPulse {
+
+            0%,
+            100% {
+                box-shadow: inset 0 0 30px rgba(239, 68, 68, 0.2), 0 0 40px -10px rgba(239, 68, 68, 0.5), 0 16px 40px rgba(0, 0, 0, 0.6);
+            }
+
+            50% {
+                box-shadow: inset 0 0 40px rgba(239, 68, 68, 0.35), 0 0 60px -5px rgba(239, 68, 68, 0.65), 0 20px 50px rgba(0, 0, 0, 0.7);
+            }
+        }
+
+        .risk-modal-title {
+            margin: 0 0 6px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.25em;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-align: center;
+            background: linear-gradient(90deg, #f97316, #ef4444, #fb7185);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.4));
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-modal-text {
+            margin: 0;
+            font-size: 0.93em;
+            line-height: 1.75;
+            color: #fca5a5;
+        }
+
+        .risk-warning-box {
+            margin: 20px 0 22px;
+            padding: 18px 18px;
+            border-radius: 18px;
+            background: rgba(127, 29, 29, 0.25);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05), 0 8px 24px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 1;
+        }
+
+        .risk-warning-box::before {
+            content: "⚠ HIGH RISK";
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 3px 14px;
+            border-radius: 999px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.62em;
+            letter-spacing: 0.18em;
+            font-weight: 700;
+            color: #fff7ed;
+            background: linear-gradient(90deg, #dc2626, #f97316);
+            border: 1px solid rgba(254, 215, 170, 0.3);
+            box-shadow: 0 0 16px rgba(239, 68, 68, 0.5);
+            white-space: nowrap;
+        }
+
+        .risk-modal-actions {
+            display: flex;
+            justify-content: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        #risk-modal-ok {
+            min-width: 190px;
+            justify-content: center;
+            background: linear-gradient(135deg, #dc2626, #f97316);
+            color: #fff7ed;
+            box-shadow: 0 8px 30px rgba(220, 38, 38, 0.5), 0 0 20px -5px rgba(239, 68, 68, 0.4);
+            border-radius: 14px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.82em;
+            letter-spacing: 0.08em;
+        }
+
+        #risk-modal-ok:hover:not(:disabled) {
+            filter: brightness(1.1);
+            transform: translateY(-3px);
+            box-shadow: 0 14px 42px rgba(220, 38, 38, 0.65), 0 0 30px -5px rgba(239, 68, 68, 0.5);
+        }
+
+        #risk-modal-ok svg {
+            fill: currentColor;
+        }
+
+        #risk-modal-ok:disabled {
+            cursor: not-allowed;
+            opacity: 0.65;
+            filter: grayscale(0.2) brightness(0.8);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+        }
+
+        .optimizer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 12px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .mod-btn.optimizer-btn {
+            min-height: 54px;
+            padding: 14px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88em;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            border-radius: 16px;
+        }
+
+        .mod-btn.optimizer-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--accent-3);
+            opacity: 1;
+            filter: drop-shadow(0 0 5px rgba(34, 211, 238, 0.5));
+        }
+
+        .dash-main {
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 28px 28px 24px;
+            overflow-y: auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .dash-page {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .dash-page.active {
+            display: flex;
+        }
+
+        .dash-page-head {
+            margin-bottom: 26px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.12);
+            position: relative;
+        }
+
+        .dash-page-head::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+        }
+
+        .dash-page-head h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5em;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            margin: 0 0 8px;
+            background: linear-gradient(135deg, #ffffff 30%, #93c5fd 60%, #a78bfa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            filter: drop-shadow(0 0 20px rgba(99, 102, 241, 0.3));
+        }
+
+        .dash-page-head p {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.88em;
+            color: #64748b;
+            line-height: 1.6;
+            max-width: 520px;
+        }
+
+        #welcome,
+        #dashboard {
+            transform: scale(0.72);
+            transform-origin: top center;
+        }
+
+        .dashboard-title {
+            font-size: 1.9em;
+            font-weight: 800;
+            letter-spacing: 0.06em;
+            background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: none;
+            align-self: flex-start;
+            text-align: left;
+            margin-top: -4px;
+            margin-bottom: 14px;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.72em;
+            font-weight: 700;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            margin: 14px 2px 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--accent-3);
+            text-shadow: 0 0 12px rgba(34, 211, 238, 0.4);
+        }
+
+        .section-title.section-title-lg {
+            font-size: 0.78em;
+            letter-spacing: 0.24em;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--accent-3);
+            box-shadow: 0 0 12px rgba(34, 211, 238, 0.7), 0 0 4px rgba(34, 211, 238, 1);
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes dotPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 8px rgba(34, 211, 238, 0.5), 0 0 3px rgba(34, 211, 238, 0.9);
+            }
+
+            50% {
+                box-shadow: 0 0 18px rgba(34, 211, 238, 0.9), 0 0 6px rgba(34, 211, 238, 1);
+            }
+        }
+
+        .section-title::after {
+            content: '';
+            height: 1px;
+            width: 80px;
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.4), transparent);
+            border-radius: 999px;
+        }
+
+        .mods-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .controls-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            width: 100%;
+            margin-top: 14px;
+            margin-bottom: 18px;
+        }
+
+        .mods-groups {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            width: 100%;
+            margin-top: 8px;
+            margin-bottom: 22px;
+        }
+
+        .mods-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .mods-group.hdr-group {
+            position: relative;
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            border-radius: 16px;
+            padding: 10px 12px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6);
+        }
+
+        .mods-group.hdr-group::before,
+        .mods-group.hdr-group::after {
+            content: "";
+            position: absolute;
+            top: 12px;
+            bottom: 12px;
+            width: 2px;
+            border-radius: 999px;
+            background: linear-gradient(180deg, rgba(96, 165, 250, 0.5), rgba(167, 139, 250, 0.25));
+        }
+
+        .mods-group.hdr-group::before {
+            left: 8px;
+        }
+
+        .mods-group.hdr-group::after {
+            right: 8px;
+        }
+
+        .dashboard-note {
+            margin-top: 18px;
+            margin-bottom: 8px;
+            padding: 16px 20px;
+            border-radius: 16px;
+            background: #0f172a;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            color: #cbd5e1;
+            font-size: 0.94em;
+            line-height: 1.85;
+            letter-spacing: 0.02em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 10px;
+        }
+
+        .dashboard-note p {
+            margin: 0;
+        }
+
+        .social-links-inline {
+            justify-content: center;
+            align-items: center;
+            margin-top: 12px;
+            gap: 12px;
+        }
+
+        .social-links-inline .social-link {
+            width: 44px;
+            height: 44px;
+        }
+
+        .notice-title {
+            font-size: 1.04em;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 22px 2px 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #e5e7eb;
+            background: none;
+            -webkit-background-clip: initial;
+            background-clip: initial;
+        }
+
+        .mod-btn {
+            background: linear-gradient(145deg, rgba(14, 20, 40, 0.9), rgba(22, 33, 58, 0.7));
+            border: 1px solid rgba(99, 102, 241, 0.12);
+            color: #94a3b8;
+            padding: 14px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9em;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 16px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.04);
+            position: relative;
+            width: 100%;
+            min-height: 54px;
+            overflow: hidden;
+        }
+
+        .mod-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), transparent 50%, rgba(34, 211, 238, 0.04));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: inherit;
+        }
+
+        .mod-btn span {
+            position: relative;
+            flex: 1;
+            text-align: left;
+            z-index: 1;
+        }
+
+        .mod-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: #4f6080;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .mod-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), 0 0 30px -8px rgba(99, 102, 241, 0.35);
+            border-color: rgba(99, 102, 241, 0.45);
+            color: #e2e8f0;
+        }
+
+        .mod-btn:hover::before {
+            opacity: 1;
+        }
+
+        .mod-btn:hover svg {
+            fill: var(--accent-1);
+            filter: drop-shadow(0 0 6px rgba(96, 165, 250, 0.6));
+        }
+
+        .mod-btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        .mod-btn::after {
+            display: none;
+        }
+
+        #particles {
+            display: none;
+        }
+
+        #notification-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 1200;
+        }
+
+        .notification {
+            min-width: 290px;
+            max-width: 360px;
+            padding: 14px 14px 14px 0;
+            border-radius: 18px;
+            font-size: 0.88em;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: linear-gradient(135deg, rgba(10, 16, 35, 0.98), rgba(5, 9, 22, 0.99));
+            border: 1px solid rgba(148, 163, 184, 0.12);
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.75),
+                0 0 0 1px rgba(255, 255, 255, 0.04),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(28px) saturate(160%);
+            opacity: 0;
+            transform: translateX(110%) scale(0.94);
+            transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.35s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .notification::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            border-radius: 18px 0 0 18px;
+            background: rgba(96, 165, 250, 0.7);
+            box-shadow: 0 0 12px rgba(96, 165, 250, 0.5);
+        }
+
+        .notification-success::after {
+            background: #22c55e;
+            box-shadow: 0 0 14px rgba(34, 197, 94, 0.6);
+        }
+
+        .notification-info::after {
+            background: #60a5fa;
+            box-shadow: 0 0 14px rgba(96, 165, 250, 0.6);
+        }
+
+        .notification-error::after {
+            background: #f87171;
+            box-shadow: 0 0 14px rgba(248, 113, 113, 0.6);
+        }
+
+        .notification::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 60%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transform: translateX(-100%);
+        }
+
+        .notification-show::before {
+            animation: notifSweep 1.4s ease-out 0.1s forwards;
+        }
+
+        @keyframes notifSweep {
+            from {
+                transform: translateX(-100%);
+            }
+
+            to {
+                transform: translateX(280%);
+            }
+        }
+
+        .notification-show {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+
+        .notification-success {
+            border-color: rgba(34, 197, 94, 0.2);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 28px -8px rgba(34, 197, 94, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .notification-info {
+            border-color: rgba(96, 165, 250, 0.2);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 28px -8px rgba(96, 165, 250, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .notification-error {
+            border-color: rgba(248, 113, 113, 0.2);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 28px -8px rgba(248, 113, 113, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.04);
+        }
+
+        .notification-message {
+            flex: 1;
+            color: #cbd5e1;
+            line-height: 1.5;
+            padding: 0 10px 0 14px;
+        }
+
+        .notification-close {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #475569;
+            cursor: pointer;
+            font-size: 0.95em;
+            width: 26px;
+            height: 26px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-right: 2px;
+            transition: background 0.2s ease, color 0.2s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.13);
+            color: #e2e8f0;
+        }
+
+        .notification-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(96, 165, 250, 0.15);
+            border-top-color: #60a5fa;
+            border-radius: 999px;
+            animation: spin 0.75s linear infinite;
+            flex-shrink: 0;
+            margin-left: 14px;
+            filter: drop-shadow(0 0 4px rgba(96, 165, 250, 0.6));
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .notification-icon {
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-left: 14px;
+        }
+
+        .notification-icon-success svg {
+            width: 16px;
+            height: 16px;
+            fill: #22c55e;
+            filter: drop-shadow(0 0 5px rgba(34, 197, 94, 0.8));
+        }
+
+        .notification-icon-error svg {
+            width: 16px;
+            height: 16px;
+            fill: #f87171;
+            filter: drop-shadow(0 0 5px rgba(248, 113, 113, 0.8));
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <svg width="0" height="0" style="position:absolute">
+        <defs>
+            <linearGradient id="nxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#60a5fa" />
+                <stop offset="100%" stop-color="#a78bfa" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <div class="welcome-orbs" id="welcomeOrbs">
+        <div class="welcome-orb"></div>
+        <div class="welcome-orb"></div>
+        <div class="welcome-orb"></div>
+    </div>
+
+    <div id="welcome">
+        <div class="welcome-logo">
+            <div class="welcome-logo-ring"></div>
+            <div class="welcome-logo-inner">
+                <svg viewBox="0 0 24 24">
+                    <path d="M3 5.5L8.5 12 3 18.5h3.5L12 12l5.5 6.5H21L15.5 12 21 5.5h-3.5L12 12 6.5 5.5H3z" />
+                </svg>
+            </div>
+        </div>
+        <div class="welcome-badge">NX PUBG MODS</div>
+        <h1>NX Tweaker</h1>
+        <p>Push your PUBG experience to the absolute limit with cinematic graphics and ultra‑smooth FPS.</p>
+        <button id="btnEnterDashboard" class="btn" data-code="NX_ENTER_DASHBOARD" data-command="ENTER_DASHBOARD"
+            onclick="enterDashboard(this)">
+            <svg viewBox="0 0 16 16">
+                <polygon points="5,4 12,8 5,12" />
+            </svg>
+            <span>ENTER DASHBOARD</span>
+        </button>
+        <div class="social-links">
+            <a href="https://discord.gg/nxgamingstore" class="social-link social-link-discord"
+                aria-label="Discord server" title="Discord" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.235 13.235 0 0 0-3.257 1.011.047.047 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c0 .017.01.033.021.047a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059l-.018-.012c-.45-.169-.875-.376-1.275-.619a.05.05 0 0 1-.02-.066l.015-.02c.086-.114.173-.23.254-.347a.05.05 0 0 1 .065-.017c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .066.017c.081.117.168.233.254.347a.051.051 0 0 1-.019.066 8.3 8.3 0 0 1-1.276.619.05.05 0 0 0-.018.012.05.05 0 0 0-.01.059c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.035c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z" />
+                </svg>
+            </a>
+            <a href="https://www.tiktok.com/@nxtiktoktv?_r=1&_t=ZS-937AgsT8Ogh" class="social-link social-link-tiktok"
+                aria-label="TikTok profile" title="TikTok" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z" />
+                </svg>
+            </a>
+            <a href="https://t.me/NxStoreofficial" class="social-link social-link-telegram"
+                aria-label="Telegram channel" title="Telegram" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M15.5 2.5 13.6 14.2c-.2 1.1-.9 1.4-1.9.9l-4.3-3.2-2.1 2a1.3 1.3 0 0 1-1 .4l.4-4.5L12.7 3.2c.6-.5-0.1-.7-.8-.2L3.8 8.1 1 7.2C0 6.9 0 6.1 1.1 5.6l13.2-5.1c.9-.3 1.7.2 1.2 2z" />
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/nxgaming_official_?igsh=ZG9qYXZpbHFnbXlo&utm_source=qr"
+                class="social-link social-link-instagram" aria-label="Instagram profile" title="Instagram"
+                target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.999 0h.001z M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm3.5-6a0.8 0 1 0 0-1.6 0.8 0 0 0 0 1.6z"
+                        fill-rule="evenodd" />
+                </svg>
+            </a>
+            <a href="https://youtube.com/@nx_tweaker?si=mGyI5xsjGhpKSShe" class="social-link social-link-youtube"
+                aria-label="YouTube channel" title="YouTube" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M15.89 4.11a2 2 0 0 0-1.41-1.41C13.23 2.4 8 2.4 8 2.4s-5.23 0-6.48.3a2 2 0 0 0-1.41 1.41C0 5.36 0 8 0 8s0 2.64.11 3.89a2 2 0 0 0 1.41 1.41C2.77 13.6 8 13.6 8 13.6s5.23 0 6.48-.3a2 2 0 0 0 1.41-1.41C16 10.64 16 8 16 8s0-2.64-.11-3.89zM6.4 10.4V5.6L10.4 8l-4 2.4z" />
+                </svg>
+            </a>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <aside class="dash-sidebar" aria-label="Dashboard navigation">
+            <div class="dash-brand">
+                <div class="dash-brand-tag">NX PUBG</div>
+                <div class="dash-brand-title">NX Tweaker</div>
+            </div>
+            <nav class="dash-nav" role="tablist" aria-label="Sections">
+                <button type="button" class="dash-nav-btn active" id="nav-clean" role="tab" aria-selected="true"
+                    aria-controls="dash-page-clean" onclick="setDashboardPage('clean')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 1.5l1.2 2.1 2.4.4-1.7 1.7.4 2.4-2.3-1.2L5.5 8.5l.4-2.4-1.7-1.7 2.4-.4L8 1.5zM3 11h10v1H3v-1zm0 2.5h10v1H3v-1z" />
+                    </svg>
+                    <span class="nav-cat-label">CLEAN</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-optimize" role="tab" aria-selected="false"
+                    aria-controls="dash-page-optimize" onclick="setDashboardPage('optimize')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <circle cx="12" cy="4" r="1.6" />
+                        <rect x="2" y="3" width="7" height="2" rx="1" />
+                        <circle cx="4" cy="8" r="1.6" />
+                        <rect x="7" y="7" width="7" height="2" rx="1" />
+                        <circle cx="10" cy="12" r="1.6" />
+                        <rect x="2" y="11" width="5" height="2" rx="1" />
+                    </svg>
+                    <span class="nav-cat-label">OPTIMIZE</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-debloat" role="tab" aria-selected="false"
+                    aria-controls="dash-page-debloat" onclick="setDashboardPage('debloat')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M3 3h10v2H3V3zm0 4h6v2H3V7zm0 4h10v2H3v-4zm8-4h2v6h-2V7zM12 3h1v2h-1V3z" />
+                    </svg>
+                    <span class="nav-cat-label">DEBLOAT</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-boost" role="tab" aria-selected="false"
+                    aria-controls="dash-page-boost" onclick="setDashboardPage('boost')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M9.5 1L6 9h3l-1.5 6L12 7H9l.5-6zM4 8l2-5h2.2L6.5 8H4z" />
+                    </svg>
+                    <span class="nav-cat-label">BOOST</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-risk" role="tab" aria-selected="false"
+                    aria-controls="dash-page-risk" onclick="setDashboardPage('risk')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 1.2 1.6 14h12.8L8 1.2zm0 3.1 3.4 6.9H4.6L8 4.3zM7.25 6.2h1.5v3.2h-1.5V6.2zm0 4.3h1.5v1.6h-1.5v-1.6z" />
+                    </svg>
+                    <span class="nav-cat-label">RISK</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-recovery" role="tab" aria-selected="false"
+                    aria-controls="dash-page-recovery" onclick="setDashboardPage('recovery')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 1.5a6.5 6.5 0 1 0 5.47 2.98l-1.2.83A5 5 0 1 1 8 3v2l3-2.5L8 0v1.5zM7.25 5v4.25l3 1.75.5-.87-2.5-1.46V5h-1z" />
+                    </svg>
+                    <span class="nav-cat-label">RECOVERY</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-gameloop" role="tab" aria-selected="false"
+                    aria-controls="dash-page-gameloop" onclick="setDashboardPage('gameloop')">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path
+                            d="M8 1.5a6.5 6.5 0 1 1-6.23 8.35h1.62A5 5 0 1 0 8 3a4.95 4.95 0 0 0-3.96 1.95L6 7H1.5V2.5l1.48 1.48A6.45 6.45 0 0 1 8 1.5zm-.75 3h1.5v4h-1.5v-4zm0 5h1.5V11h-1.5V9.5z" />
+                    </svg>
+                    <span class="nav-cat-label">GAMELOOP</span>
+                </button>
+                <button type="button" class="dash-nav-btn" id="nav-graphics" role="tab" aria-selected="false"
+                    aria-controls="dash-page-graphics" onclick="setDashboardPage('graphics')">
+                    <svg viewBox="0 0 16 16">
+                        <path fill="currentColor"
+                            d="M2 3h12v10H2V3zm1 1v8h10V4H3zm2 2h6v1H5V6zm0 2h4v1H5V8zm0 2h6v1H5v-1z" />
+                    </svg>
+                    <span class="nav-cat-label">GRAPHICS</span>
+                </button>
+
+            </nav>
+            <div class="dash-sidebar-spacer" aria-hidden="true"></div>
+            <div class="dash-about-foot">
+                <button type="button" class="btn-about" id="btn-about" aria-haspopup="dialog"
+                    aria-controls="about-modal" aria-expanded="false" onclick="openAboutModal()">
+                    <svg viewBox="0 0 16 16">
+                        <path fill="currentColor"
+                            d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm-.25 6.25h.5v4h-.5v-4zm.25-2a.65.65 0 1 1 0 1.3.65.65 0 0 1 0-1.3z" />
+                    </svg>
+                    <span>About</span>
+                </button>
+            </div>
+        </aside>
+        <div class="dash-main">
+            <div id="dash-page-clean" class="dash-page active" role="tabpanel" aria-labelledby="nav-clean"
+                aria-hidden="false">
+                <div class="dash-page-head">
+                    <h2>Clean</h2>
+                    <p>Caches, RAM, network stack, firewall and temp files. Run when the game and emulator are closed.
+                    </p>
+                </div>
+                <div class="section-title section-title-lg">Tools</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_FULL_CLEAN"
+                        data-command="FULL_CLEAN" data-action="fullClean"
+                        onclick="runOptimizerAction(this,'fullClean')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.5l1.2 2.1 2.4.4-1.7 1.7.4 2.4-2.3-1.2L5.5 8.5l.4-2.4-1.7-1.7 2.4-.4L8 1.5zM3 11h10v1H3v-1zm0 2.5h10v1H3v-1z" />
+                        </svg>
+                        <span>Full Clean</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_CLEAN_SHADERCACHE"
+                        data-command="CLEAN_SHADERCACHE" data-action="cleanShaderCache"
+                        onclick="runOptimizerAction(this,'cleanShaderCache')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.2 2.2 4.6V11L8 14.4 13.8 11V4.6L8 1.2zm0 1.7 4.3 2.5L8 7.9 3.7 5.4 8 2.9zm-4.6 3.8 3.9 2.3v4.2l-3.9-2.3V6.7zm8.9 0v4.2l-3.9 2.3V9l3.9-2.3z" />
+                        </svg>
+                        <span>Clean ShaderCache</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_CLEAN_CACHE"
+                        data-command="CLEAN_CACHE" data-action="cleanCache"
+                        onclick="runOptimizerAction(this,'cleanCache')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M2.5 4.5A2.5 2.5 0 0 1 5 2h6a2.5 2.5 0 0 1 2.5 2.5v7A2.5 2.5 0 0 1 11 14H5a2.5 2.5 0 0 1-2.5-2.5v-7zM5 3.5a1 1 0 0 0-1 1v1h8v-1a1 1 0 0 0-1-1H5zm7 3.5H4v4.5a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V7z" />
+                        </svg>
+                        <span>Clean Cache</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_CLEAN_GAMELOOP"
+                        data-command="CLEAN_GAMELOOP" data-action="cleanGameLoop"
+                        onclick="runOptimizerAction(this,'cleanGameLoop')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.5a6.5 6.5 0 1 1-6.23 8.35h1.62A5 5 0 1 0 8 3a4.95 4.95 0 0 0-3.96 1.95L6 7H1.5V2.5l1.48 1.48A6.45 6.45 0 0 1 8 1.5zm-.75 3h1.5v4h-1.5v-4zm0 5h1.5V11h-1.5V9.5z" />
+                        </svg>
+                        <span>Clean GameLoop</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_IP_FLUSH" data-command="IP_FLUSH"
+                        data-action="ipFlush" onclick="runOptimizerAction(this,'ipFlush')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M2 5.5h12v1.2H2v-1.2zm0 3.2h12v1.2H2V8.7zM8 2.5c1.9 0 3.4 1.3 3.8 3h-1.3c-.3-1-1.2-1.8-2.5-1.8S6.3 4.5 6 5.5H4.7c.4-1.7 1.9-3 3.3-3zM8 13.5c-1.9 0-3.4-1.3-3.8-3h1.3c.3 1 1.2 1.8 2.5 1.8s2.2-.8 2.5-1.8h1.3c-.4 1.7-1.9 3-3.3 3z" />
+                        </svg>
+                        <span>FIX FAKE DAMAGE</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_CLEAR_TEMP"
+                        data-command="CLEAR_TEMP" data-action="clearTemp"
+                        onclick="runOptimizerAction(this,'clearTemp')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M5 2h6l1 2H4l1-2zm-1 3h8l-.5 9a1 1 0 0 1-1 .9H5.5a1 1 0 0 1-1-.9L4 5zm3 2v5h1V7H7zm2 0v5h1V7H9z" />
+                        </svg>
+                        <span>Clear Temp</span>
+                    </button>
+                </div>
+            </div>
+            <div id="dash-page-optimize" class="dash-page" role="tabpanel" aria-labelledby="nav-optimize"
+                aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Optimize</h2>
+                    <p>Timer resolution and system timing tweaks.</p>
+                </div>
+                <div class="section-title section-title-lg">Timer</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_TIMER_RESOLUTION"
+                        data-command="NX_TIMER_RESOLUTION" data-action="nxTimerResolution"
+                        onclick="runOptimizerAction(this,'nxTimerResolution')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1zm0 1.5a5.5 5.5 0 1 1 0 11 5.5 5.5 0 0 1 0-11zm-.25 2.75h.5v3.25l2.4 1.45-.25.43L7.75 8.15V5.25z" />
+                        </svg>
+                        <span>NXTimerResolution</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_TIME_COMMEND"
+                        data-command="NX_TIME_COMMEND" data-action="nxTimeCommend"
+                        onclick="runOptimizerAction(this,'nxTimeCommend')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.2a6.8 6.8 0 1 0 0 13.6A6.8 6.8 0 0 0 8 1.2zm0 1.6a5.2 5.2 0 1 1 0 10.4A5.2 5.2 0 0 1 8 2.8zm-.7 2.1h1.4v3.1l2.7 1.7-.5 1-3.6-2.2V4.9z" />
+                        </svg>
+                        <span>NX Time Commend</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_NVIDIA_CONTROL_PANEL"
+                        data-command="NVIDIA_CONTROL_PANEL" data-action="nvidiaControlPanel"
+                        onclick="runOptimizerAction(this,'nvidiaControlPanel')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M1.5 3.5h13v9h-13v-9zm1.2 1.2v6.6h10.6V4.7H2.7zm1.1 1.1h4.8v1.1H3.8V5.8zm0 2h7.6v1.1H3.8V7.8zm0 2h5.2v1.1H3.8V9.8z" />
+                        </svg>
+                        <span>NVIDIA CONTROL PANEL</span>
+                    </button>
+                </div>
+            </div>
+            <div id="dash-page-debloat" class="dash-page" role="tabpanel" aria-labelledby="nav-debloat"
+                aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Debloat</h2>
+                    <p>Remove bundled apps with or without Microsoft components. Use with care.</p>
+                </div>
+                <div class="section-title section-title-lg">Presets</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_FULL_DEBLOAT_WITH_MICROSOFT"
+                        data-command="FULL_DEBLOAT_WITH_MICROSOFT" data-action="debloatWithMicrosoft"
+                        onclick="runOptimizerAction(this,'debloatWithMicrosoft')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M3 3h10v10H3V3zm1 1v8h8V4H4zm1 1h6v1H5V5zm0 2h4v1H5V7zm0 2h6v1H5V9zM13 2l-2 2h1.5A2.5 2.5 0 0 1 15 6.5V8h1V6.5A3.5 3.5 0 0 0 12.5 3H11l2-2h-1z" />
+                        </svg>
+                        <span>Full Debloate With Microsoft</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_FULL_DEBLOAT_WITHOUT_MICROSOFT"
+                        data-command="FULL_DEBLOAT_WITHOUT_MICROSOFT" data-action="debloatWithoutMicrosoft"
+                        onclick="runOptimizerAction(this,'debloatWithoutMicrosoft')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M3 3h10v10H3V3zm1 1v8h8V4H4zm1 1h6v1H5V5zm0 2h4v1H5V7zm0 2h6v1H5V9zM14.5 2L9 7.5l-2-2L3 10.5l1 1 3-3 2 2 6.5-6.5-1-1z" />
+                        </svg>
+                        <span>Full Debloate Without Microsoft</span>
+                    </button>
+                </div>
+            </div>
+            <div id="dash-page-boost" class="dash-page" role="tabpanel" aria-labelledby="nav-boost" aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Boost</h2>
+                    <p>Performance shortcuts. More actions can be wired from the host app.</p>
+                </div>
+                <div class="section-title section-title-lg">Tools</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_BOOST_LATENCY"
+                        data-command="BOOST_LATENCY" data-action="boostLatency"
+                        onclick="runOptimizerAction(this,'boostLatency')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.2a6.8 6.8 0 1 0 6.1 9.8h-1.8A5.2 5.2 0 1 1 8 2.8c1.5 0 2.8.6 3.8 1.6L10 6.2h4.5V1.7l-1.6 1.6A6.75 6.75 0 0 0 8 1.2zm-.7 3.5h1.4v3.8l2.6 1.5-.4 1.1L7.3 9V4.7z" />
+                        </svg>
+                        <span>BOOST LATENCY</span>
+                    </button>
+
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_BOOST_GAMELOOP"
+                        data-command="BOOST_GAMELOOP" data-action="boostGameLoop"
+                        onclick="runOptimizerAction(this,'boostGameLoop')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.5a6.5 6.5 0 1 1-6.5 6.5h1.6A4.9 4.9 0 1 0 8 3.1 4.9 4.9 0 0 0 4.2 4.9L6.4 7H1.6V2.2l1.4 1.4A6.47 6.47 0 0 1 8 1.5zm2.8 4.7h1.4v1.4h-1.4V6.2zm-7 0h1.4v1.4H3.8V6.2zm2.2 1.9h4v1.3H6v-1.3z" />
+                        </svg>
+                        <span>BOOST GAMELOOP</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_BOOST_PERFORMANCE"
+                        data-command="BOOST_PERFORMANCE" data-action="boostPerformance"
+                        onclick="runOptimizerAction(this,'boostPerformance')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M2 10.5h2.2L6 6l2.1 5 2.1-3h3.8v1.5h-2.9L8 14 6 9.2 4.9 12H2v-1.5zM2 4h12v1.5H2V4z" />
+                        </svg>
+                        <span>Boost Perfoormance</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_BOOST_STABILITY"
+                        data-command="BOOST_STABILITY" data-action="boostStability"
+                        onclick="runOptimizerAction(this,'boostStability')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.7 13 4v3.4c0 3-2.1 5.2-5 6.2-2.9-1-5-3.2-5-6.2V4l5-2.3zm0 1.6L4.5 5v2.4c0 2.2 1.5 3.9 3.5 4.7 2-.8 3.5-2.5 3.5-4.7V5L8 3.3zm-1 2.4h2v4H7v-4z" />
+                        </svg>
+                        <span>Boost Stability</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_MAX_PERFORMANCE"
+                        data-command="MAX_PERFORMANCE" data-action="maxPerformance"
+                        onclick="runOptimizerAction(this,'maxPerformance')">
+                        <svg viewBox="0 0 16 16">
+                            <path d="M2 12.5h12V14H2v-1.5zm1-2 3-3 2 2 4-4 1 1-5 5-2-2-2 2-1-1zM2 2h1.5v8H2V2z" />
+                        </svg>
+                        <span>Max Performance</span>
+                    </button>
+                </div>
+            </div>
+            <div id="dash-page-risk" class="dash-page" role="tabpanel" aria-labelledby="nav-risk" aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Risk</h2>
+                    <p>High-risk tweaks. Use only if you know what you’re doing.</p>
+                </div>
+                <div class="section-title section-title-lg">Tools</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_SERVICE_DEBLOATER"
+                        data-command="SERVICE_DEBLOATER" data-action="serviceDebloater"
+                        onclick="runOptimizerAction(this,'serviceDebloater')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.8 3 4.1v3.3c0 2.9 2 5.1 5 6.1 3-1 5-3.2 5-6.1V4.1L8 1.8zm0 1.6L11.5 5v2.4c0 2.1-1.4 3.8-3.5 4.6-2.1-.8-3.5-2.5-3.5-4.6V5L8 3.4zm-2.6 2h1.2v3.7H5.4V5.4zm2 0h1.2v3.7H7.4V5.4zm2 0h1.2v3.7H9.4V5.4zM5 10.2h6v1.2H5v-1.2z" />
+                        </svg>
+                        <span>SERVICE DEBLOATER</span>
+                    </button>
+                </div>
+            </div>
+            <div id="dash-page-graphics" class="dash-page" role="tabpanel" aria-labelledby="nav-graphics"
+                aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Graphics</h2>
+                    <p>FPS and HDR presets, then launch your emulator and game from here.</p>
+                </div>
+                <div class="section-title section-title-lg">Presets</div>
+                <div class="mods-groups">
+                    <div class="mods-group">
+                        <div class="section-title">Smooth</div>
+                        <div class="mods-container">
+                            <button class="mod-btn" data-code="NX_SUPER_SMOOTH_120" data-command="SUPER_SMOOTH_120"
+                                onclick="activateMod(this,'superSmooth120')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="11" y2="5" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Super Smooth 120FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_SMOOTH_120" data-command="SMOOTH_120"
+                                onclick="activateMod(this,'other')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="10" y2="10" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Smooth 120FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_BALANCED_120" data-command="BALANCED_120"
+                                onclick="activateMod(this,'balanced120')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="10" y2="10" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Balanced 120FPS</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mods-group">
+                        <div class="section-title">HDR</div>
+                        <div class="mods-container">
+                            <button class="mod-btn" data-code="NX_HDR_60" data-command="HDR_60"
+                                onclick="activateMod(this,'hdr60')">
+                                <svg viewBox="0 0 16 16">
+                                    <polygon
+                                        points="8,2 9.8,6.2 14,6.5 10.7,9.1 11.8,13 8,10.8 4.2,13 5.3,9.1 2,6.5 6.2,6.2" />
+                                </svg>
+                                <span>HDR 60FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_HDR_90" data-command="HDR_90"
+                                onclick="activateMod(this,'hdr90')">
+                                <svg viewBox="0 0 16 16">
+                                    <polygon
+                                        points="8,2 9.8,6.2 14,6.5 10.7,9.1 11.8,13 8,10.8 4.2,13 5.3,9.1 2,6.5 6.2,6.2" />
+                                </svg>
+                                <span>HDR 90FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_HDR_120" data-command="HDR_120"
+                                onclick="activateMod(this,'hdr120')">
+                                <svg viewBox="0 0 16 16">
+                                    <polygon
+                                        points="8,2 9.8,6.2 14,6.5 10.7,9.1 11.8,13 8,10.8 4.2,13 5.3,9.1 2,6.5 6.2,6.2" />
+                                </svg>
+                                <span>HDR 120FPS</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="mods-group">
+                        <div class="section-title">Ultra HDR</div>
+                        <div class="mods-container">
+                            <button class="mod-btn" data-code="NX_ULTRAHDR_60" data-command="ULTRAHDR_60"
+                                onclick="activateMod(this,'ultrahdr60')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="12" y2="6" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Ultra HDR 60FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_ULTRAHDR_90" data-command="ULTRAHDR_90"
+                                onclick="activateMod(this,'ultrahdr90')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="12" y2="6" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Ultra HDR 90FPS</span>
+                            </button>
+                            <button class="mod-btn" data-code="NX_ULTRAHDR_120" data-command="ULTRAHDR_120"
+                                onclick="activateMod(this,'ultrahdr120')">
+                                <svg viewBox="0 0 16 16">
+                                    <circle cx="8" cy="8" r="6" fill="none" stroke="#e5e7eb" stroke-width="1.5" />
+                                    <line x1="8" y1="8" x2="12" y2="6" stroke="#e5e7eb" stroke-width="1.5"
+                                        stroke-linecap="round" />
+                                </svg>
+                                <span>Ultra HDR 120FPS</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="section-title section-title-lg">Emulator</div>
+                <div class="controls-container">
+                    <button class="mod-btn" data-code="NX_LAUNCH_EMULATOR" data-command="LAUNCH_EMULATOR"
+                        onclick="startEmulator(this)">
+                        <svg viewBox="0 0 16 16">
+                            <rect x="2" y="3" width="12" height="9" rx="1.5" ry="1.5" fill="none" stroke="#e5e7eb"
+                                stroke-width="1.4" />
+                            <rect x="5" y="12.5" width="6" height="1" fill="#e5e7eb" />
+                        </svg>
+                        <span>Launch Emulator</span>
+                    </button>
+                    <button class="mod-btn" data-code="NX_LAUNCH_GAME" data-command="LAUNCH_GAME"
+                        onclick="startGame(this)">
+                        <svg viewBox="0 0 16 16">
+                            <polygon points="5,4 12,8 5,12" />
+                        </svg>
+                        <span>Launch Game</span>
+                    </button>
+                    <button class="mod-btn" data-code="NX_STOP_EMULATOR" data-command="STOP_EMULATOR"
+                        onclick="killEmulator(this)">
+                        <svg viewBox="0 0 16 16">
+                            <rect x="4" y="4" width="8" height="8" />
+                        </svg>
+                        <span>Stop Emulator</span>
+                    </button>
+                </div>
+            </div>
+
+            <div id="dash-page-gameloop" class="dash-page" role="tabpanel" aria-labelledby="nav-gameloop"
+                aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>GameLoop</h2>
+                    <p>Apply specialized models and settings for GameLoop emulator.</p>
+                </div>
+                <div class="section-title section-title-lg">Optimization</div>
+                <div class="optimizer-grid">
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_APPLY_MODEL"
+                        data-command="APPLY_MODEL" onclick="runOptimizerAction(this,'applyModel')">
+                        <svg viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M1 2.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752a.5.5 0 0 1 0 .696c-.654.689-1.782.886-3.112.752-1.234-.124-2.503-.523-3.388-.893V2.828zm7.5.752c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v.696c-.885.37-2.154.769-3.388.893-1.33.134-2.458-.063-3.112-.752a.5.5 0 0 1 0-.696zM1 12.828c.885-.37 2.154-.769 3.388-.893 1.33-.134 2.458.063 3.112.752a.5.5 0 0 1 0 .696c-.654.689-1.782.886-3.112.752-1.234-.124-2.503-.523-3.388-.893v-.696zm7.5.752c.654-.689 1.782-.886 3.112-.752 1.234.124 2.503.523 3.388.893v.696c-.885.37-2.154.769-3.388.893-1.33.134-2.458-.063-3.112-.752a.5.5 0 0 1 0-.696z" />
+                        </svg>
+                        <span>APPLY MODEL</span>
+                    </button>
+                    <button type="button" class="mod-btn optimizer-btn" data-code="NX_APPLY_SETTINGS"
+                        data-command="APPLY_SETTINGS" onclick="runOptimizerAction(this,'applySettings')">
+                        <svg viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.17.311c.586 1.06.359 2.378-.65 2.806l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.17a1.464 1.464 0 0 1 2.806.65l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.17-.311a1.464 1.464 0 0 1 .65-2.806l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.17a1.464 1.464 0 0 1-2.806-.65l-.1-.34zM8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6z" />
+                        </svg>
+                        <span>APPLY SETTINGS</span>
+                    </button>
+                </div>
+            </div>
+
+
+            <!-- ============================================================
+                 RECOVERY PAGE
+            ============================================================= -->
+            <div id="dash-page-recovery" class="dash-page" role="tabpanel" aria-labelledby="nav-recovery"
+                aria-hidden="true">
+                <div class="dash-page-head">
+                    <h2>Recovery</h2>
+                    <p>Manage your Paks mod files — copy, set, select and apply them to GameLoop without touching game
+                        files manually.</p>
+                </div>
+
+                <div class="section-title section-title-lg">Paks Operations</div>
+                <div class="optimizer-grid">
+
+                    <!-- COPY PAKS -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-copy-paks" data-code="NX_COPY_PAKS"
+                        data-command="COPY_PAKS" onclick="runRecoveryAction(this,'copyPaks')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M4 2h6l3 3v9H4V2zm1 1v10h7V6h-3V3H5zm5 .7L11.3 5H10V3.7zM1 4h2v1H2v9h7v-1h1v2H1V4z" />
+                        </svg>
+                        <span>COPY PAKS</span>
+                    </button>
+
+
+
+                    <!-- SELECT PAKS FOLDER -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-select-paks-folder"
+                        data-code="NX_SELECT_PAKS_FOLDER" data-command="SELECT_PAKS_FOLDER"
+                        onclick="runRecoveryAction(this,'selectPaksFolder')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M1.5 3A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 14.5 5H7.8L6.3 3H1.5z" />
+                        </svg>
+                        <span>SELECT PAKS FOLDER</span>
+                    </button>
+
+                    <!-- APPLY THE RECOVERY -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-apply-recovery"
+                        data-code="NX_APPLY_RECOVERY" data-command="APPLY_RECOVERY"
+                        onclick="runRecoveryAction(this,'applyRecovery')">
+                        <svg viewBox="0 0 16 16">
+                            <path
+                                d="M8 1.5a6.5 6.5 0 1 0 5.47 2.98l-1.2.83A5 5 0 1 1 8 3v2l3-2.5L8 0v1.5zm-1 3.5 4.5 3L7 11.5V5z" />
+                        </svg>
+                        <span>APPLY THE RECOVERY</span>
+                    </button>
+
+                </div>
+
+                <div class="section-title section-title-lg">SENSIVTY RECOVRY</div>
+                <div class="optimizer-grid">
+
+                    <!-- COBY SENS -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-copy-sens" data-code="NX_COPY_SENS"
+                        data-command="COPY_SENS" onclick="runRecoveryAction(this,'copySens')">
+                        <svg viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M4 2h6l3 3v9H4V2zm1 1v10h7V6h-3V3H5zm5 .7L11.3 5H10V3.7zM1 4h2v1H2v9h7v-1h1v2H1V4z" />
+                        </svg>
+                        <span>COBY SENS</span>
+                    </button>
+
+                    <!-- SELECT SENS -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-select-sens" data-code="NX_SELECT_SENS"
+                        data-command="SELECT_SENS" onclick="runRecoveryAction(this,'selectSens')">
+                        <svg viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M1.5 3A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-6A1.5 1.5 0 0 0 14.5 5H7.8L6.3 3H1.5z" />
+                        </svg>
+                        <span>SELECT SENS</span>
+                    </button>
+
+                    <!-- APPLY SENS -->
+                    <button type="button" class="mod-btn optimizer-btn" id="btn-apply-sens" data-code="NX_APPLY_SENS"
+                        data-command="APPLY_SENS" onclick="runRecoveryAction(this,'applySens')">
+                        <svg viewBox="0 0 16 16">
+                            <path fill="currentColor"
+                                d="M8 1.5a6.5 6.5 0 1 0 5.47 2.98l-1.2.83A5 5 0 1 1 8 3v2l3-2.5L8 0v1.5zm-1 3.5 4.5 3L7 11.5V5z" />
+                        </svg>
+                        <span>APPLY SENS</span>
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    </div>
+
+    <div id="about-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="about-modal-title"
+        aria-hidden="true">
+        <div class="about-modal-backdrop" onclick="closeAboutModal()" aria-hidden="true"></div>
+        <div class="about-modal-panel">
+            <button type="button" class="about-modal-close" onclick="closeAboutModal()"
+                aria-label="Close">&times;</button>
+            <h3 id="about-modal-title">NX Tweaker</h3>
+            <p class="about-modal-text">This program is completely free. To purchase the paid version, contact us.</p>
+            <div class="about-modal-links" role="group" aria-label="Social links">
+                <a href="https://discord.gg/nxgamingstore" class="social-link about-modal-link about-modal-discord"
+                    aria-label="Discord server" title="Discord" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M13.545 2.907a13.227 13.227 0 0 0-3.257-1.011.05.05 0 0 0-.052.025c-.141.25-.297.577-.406.833a12.19 12.19 0 0 0-3.658 0 8.258 8.258 0 0 0-.412-.833.051.051 0 0 0-.052-.025 13.235 13.235 0 0 0-3.257 1.011.047.047 0 0 0-.021.018C.356 6.024-.213 9.047.066 12.032c0 .017.01.033.021.047a13.276 13.276 0 0 0 3.995 2.02.05.05 0 0 0 .056-.019c.308-.42.582-.863.818-1.329a.05.05 0 0 0-.01-.059l-.018-.012c-.45-.169-.875-.376-1.275-.619a.05.05 0 0 1-.02-.066l.015-.02c.086-.114.173-.23.254-.347a.05.05 0 0 1 .065-.017c2.619 1.196 5.454 1.196 8.041 0a.05.05 0 0 1 .066.017c.081.117.168.233.254.347a.051.051 0 0 1-.019.066 8.3 8.3 0 0 1-1.276.619.05.05 0 0 0-.018.012.05.05 0 0 0-.01.059c.24.465.515.909.817 1.329a.05.05 0 0 0 .056.019 13.235 13.235 0 0 0 4.001-2.02.049.049 0 0 0 .021-.035c.334-3.451-.559-6.449-2.366-9.106a.034.034 0 0 0-.02-.019Zm-8.198 7.307c-.789 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.45.73 1.438 1.613 0 .888-.637 1.612-1.438 1.612Zm5.316 0c-.788 0-1.438-.724-1.438-1.612 0-.889.637-1.613 1.438-1.613.807 0 1.451.73 1.438 1.613 0 .888-.631 1.612-1.438 1.612Z" />
+                    </svg>
+                </a>
+                <a href="https://t.me/NxStoreofficial" class="social-link about-modal-link about-modal-telegram"
+                    aria-label="Telegram channel" title="Telegram" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M15.5 2.5 13.6 14.2c-.2 1.1-.9 1.4-1.9.9l-4.3-3.2-2.1 2a1.3 1.3 0 0 1-1 .4l.4-4.5L12.7 3.2c.6-.5-0.1-.7-.8-.2L3.8 8.1 1 7.2C0 6.9 0 6.1 1.1 5.6l13.2-5.1c.9-.3 1.7.2 1.2 2z" />
+                    </svg>
+                </a>
+                <a href="https://www.tiktok.com/@nxtiktoktv?_r=1&_t=ZS-937AgsT8Ogh"
+                    class="social-link about-modal-link about-modal-tiktok" aria-label="TikTok profile" title="TikTok"
+                    target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M9 0h1.98c.144.715.54 1.617 1.235 2.512C12.895 3.389 13.797 4 15 4v2c-1.753 0-3.07-.814-4-1.829V11a5 5 0 1 1-5-5v2a3 3 0 1 0 3 3z" />
+                    </svg>
+                </a>
+                <a href="https://www.instagram.com/nxgaming_official_?igsh=ZG9qYXZpbHFnbXlo&utm_source=qr"
+                    class="social-link about-modal-link about-modal-instagram" aria-label="Instagram profile"
+                    title="Instagram" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M8 0C5.829 0 5.556.01 4.703.048 3.85.088 3.269.222 2.76.42a3.917 3.917 0 0 0-1.417.923A3.927 3.927 0 0 0 .42 2.76C.222 3.268.087 3.85.048 4.7.01 5.555 0 5.827 0 8.001c0 2.172.01 2.444.048 3.297.04.852.174 1.433.372 1.942.205.526.478.972.923 1.417.444.445.89.719 1.416.923.51.198 1.09.333 1.942.372C5.555 15.99 5.827 16 8 16s2.444-.01 3.298-.048c.851-.04 1.434-.174 1.943-.372a3.916 3.916 0 0 0 1.416-.923c.445-.445.718-.891.923-1.417.197-.509.332-1.09.372-1.942C15.99 10.445 16 10.173 16 8s-.01-2.445-.048-3.299c-.04-.851-.175-1.433-.372-1.941a3.926 3.926 0 0 0-.923-1.417A3.911 3.911 0 0 0 13.24.42c-.51-.198-1.092-.333-1.943-.372C10.443.01 10.172 0 7.999 0h.001z M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm0-1.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5zm3.5-6a0.8 0 1 0 0-1.6 0.8 0 0 0 0 1.6z"
+                            fill-rule="evenodd" />
+                    </svg>
+                </a>
+                <a href="https://youtube.com/@nx_tweaker?si=mGyI5xsjGhpKSShe"
+                    class="social-link about-modal-link about-modal-youtube" aria-label="YouTube channel"
+                    title="YouTube" target="_blank" rel="noopener noreferrer">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M15.89 4.11a2 2 0 0 0-1.41-1.41C13.23 2.4 8 2.4 8 2.4s-5.23 0-6.48.3a2 2 0 0 0-1.41 1.41C0 5.36 0 8 0 8s0 2.64.11 3.89a2 2 0 0 0 1.41 1.41C2.77 13.6 8 13.6 8 13.6s5.23 0 6.48-.3a2 2 0 0 0 1.41-1.41C16 10.64 16 8 16 8s0-2.64-.11-3.89zM6.4 10.4V5.6L10.4 8l-4 2.4z" />
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div id="risk-modal" class="about-modal" role="dialog" aria-modal="true" aria-labelledby="risk-modal-title"
+        aria-hidden="true">
+        <div class="about-modal-backdrop" aria-hidden="true"></div>
+        <div class="about-modal-panel risk-modal-panel">
+            <div class="risk-modal-icon" aria-hidden="true">
+                <svg viewBox="0 0 16 16">
+                    <path
+                        d="M8 1.2 1.6 14h12.8L8 1.2zm0 3.1 3.4 6.9H4.6L8 4.3zM7.25 6.2h1.5v3.2h-1.5V6.2zm0 4.3h1.5v1.6h-1.5v-1.6z" />
+                </svg>
+            </div>
+            <h3 id="risk-modal-title" class="about-modal-title risk-modal-title">Risk Warning - Advanced Settings</h3>
+            <div class="risk-warning-box">
+                <p class="about-modal-text risk-modal-text" style="text-align:center; direction:rtl;">
+                    هذا القسم يحتوي على إعدادات <strong style="color:#fca5a5;">متقدمة وخطيرة جداً</strong> على
+                    النظام.<br>
+                    الاستخدام الخاطئ قد يُسبب مشاكل في الأداء أو عدم استقرار Windows.
+                </p>
+                <p class="about-modal-text risk-modal-text"
+                    style="text-align:center; margin-top:10px; direction:ltr; color:#f87171; font-size:0.88em;">
+                    Advanced system tweaks — use only if you understand the risks.
+                </p>
+            </div>
+            <div class="risk-modal-actions">
+                <button type="button" class="btn" id="risk-modal-ok" disabled aria-disabled="true">
+                    <svg viewBox="0 0 16 16" aria-hidden="true">
+                        <path
+                            d="M13.485 1.929a1 1 0 0 1 1.415 1.414l-8 8a1 1 0 0 1-1.414 0l-3-3A1 1 0 0 1 3.9 7.929l2.293 2.293 7.292-7.293z" />
+                    </svg>
+                    <span>OK (10)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="notification-container" role="status" aria-live="polite"></div>
+
+    <script>
+        // Safety fallback: ensure welcome card is always visible
+        // Some systems block CSS animations (accessibility settings, old WebView2, slow internet losing Google Fonts)
+        (function () {
+            function ensureWelcomeVisible() {
+                var w = document.getElementById('welcome');
+                if (!w) return;
+                var cs = window.getComputedStyle(w);
+                var op = parseFloat(cs.opacity);
+                // If still invisible after 1.5s, force it visible
+                if (op < 0.1) {
+                    w.style.cssText += 'opacity:1!important;transform:none!important;animation:none!important;';
+                    // Also fix child elements that animate in
+                    var els = w.querySelectorAll('.welcome-logo,.welcome-badge,h1,p,.btn,.social-links');
+                    for (var i = 0; i < els.length; i++) {
+                        els[i].style.cssText += 'opacity:1!important;transform:none!important;animation:none!important;';
+                    }
+                }
+            }
+            // Check after the animation should have completed
+            setTimeout(ensureWelcomeVisible, 1500);
+        })();
+
+
+
+        function openAboutModal() {
+            const m = document.getElementById('about-modal');
+            const b = document.getElementById('btn-about');
+            if (!m) return;
+            m.classList.add('is-open');
+            m.setAttribute('aria-hidden', 'false');
+            if (b) b.setAttribute('aria-expanded', 'true');
+            document.body.classList.add('about-modal-open');
+        }
+
+        function closeAboutModal() {
+            const m = document.getElementById('about-modal');
+            const b = document.getElementById('btn-about');
+            if (!m) return;
+            m.classList.remove('is-open');
+            m.setAttribute('aria-hidden', 'true');
+            if (b) b.setAttribute('aria-expanded', 'false');
+            document.body.classList.remove('about-modal-open');
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape') return;
+            const risk = document.getElementById('risk-modal');
+            if (risk && risk.classList.contains('is-open')) return;
+            const about = document.getElementById('about-modal');
+            if (about && about.classList.contains('is-open')) closeAboutModal();
+        });
+
+        const DASH_PAGES = ['clean', 'optimize', 'debloat', 'boost', 'risk', 'graphics', 'recovery', 'gameloop'];
+
+        let riskWarningAcceptedInMemory = false;
+
+        function isRiskWarningAccepted() {
+            return riskWarningAcceptedInMemory;
+        }
+
+        function markRiskWarningAccepted() {
+            riskWarningAcceptedInMemory = true;
+        }
+
+        function setDashboardPage(page, opts) {
+            const notify = !opts || opts.notifyHost !== false;
+            let p = page === 'automation' ? 'clean' : page;
+            if (!DASH_PAGES.includes(p)) p = 'clean';
+            if (p === 'risk' && (!opts || opts.skipRiskGate !== true) && !isRiskWarningAccepted()) {
+                openRiskModal(() => setDashboardPage('risk', { notifyHost: notify, skipRiskGate: true }));
+                return;
+            }
+            DASH_PAGES.forEach(id => {
+                const panel = document.getElementById('dash-page-' + id);
+                const nav = document.getElementById('nav-' + id);
+                const on = id === p;
+                if (panel) {
+                    panel.classList.toggle('active', on);
+                    panel.setAttribute('aria-hidden', on ? 'false' : 'true');
+                }
+                if (nav) {
+                    nav.classList.toggle('active', on);
+                    nav.setAttribute('aria-selected', on ? 'true' : 'false');
+                }
+            });
+            if (notify) sendToHost('dashboardPage', { page: p });
+        }
+
+        let riskModalCountdownTimer = null;
+        function openRiskModal(onOk) {
+            const m = document.getElementById('risk-modal');
+            const ok = document.getElementById('risk-modal-ok');
+            if (!m || !ok) return;
+
+            if (riskModalCountdownTimer) {
+                clearInterval(riskModalCountdownTimer);
+                riskModalCountdownTimer = null;
+            }
+
+            m.classList.add('is-open');
+            m.setAttribute('aria-hidden', 'false');
+            document.body.classList.add('risk-modal-open');
+
+            let remaining = 10;
+            ok.disabled = true;
+            ok.setAttribute('aria-disabled', 'true');
+            const label = ok.querySelector('span');
+            if (label) label.textContent = `OK (${remaining})`;
+            ok.onclick = null;
+
+            riskModalCountdownTimer = setInterval(() => {
+                remaining -= 1;
+                if (label) label.textContent = remaining > 0 ? `OK (${remaining})` : 'OK';
+                if (remaining <= 0) {
+                    clearInterval(riskModalCountdownTimer);
+                    riskModalCountdownTimer = null;
+                    ok.disabled = false;
+                    ok.setAttribute('aria-disabled', 'false');
+                    ok.onclick = () => {
+                        markRiskWarningAccepted();
+                        closeRiskModal();
+                        if (typeof onOk === 'function') onOk();
+                    };
+                }
+            }, 1000);
+        }
+
+        function closeRiskModal() {
+            const m = document.getElementById('risk-modal');
+            if (!m) return;
+            m.classList.remove('is-open');
+            m.setAttribute('aria-hidden', 'true');
+            document.body.classList.remove('risk-modal-open');
+            if (riskModalCountdownTimer) {
+                clearInterval(riskModalCountdownTimer);
+                riskModalCountdownTimer = null;
+            }
+        }
+
+        // Enter Dashboard
+        function enterDashboard(el) {
+            document.getElementById('welcome').style.display = 'none';
+            var orbs = document.getElementById('welcomeOrbs'); if (orbs) orbs.style.display = 'none';
+            document.body.classList.add('dashboard-open');
+            document.getElementById('dashboard').style.display = 'flex';
+            const code = el && el.dataset ? el.dataset.code : 'NX_ENTER_DASHBOARD';
+            const command = el && el.dataset ? el.dataset.command : 'ENTER_DASHBOARD';
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('enterDashboard', { code, command, args });
+            setDashboardPage('clean', { notifyHost: false });
+        }
+
+        const notificationContainer = document.getElementById('notification-container');
+        let pendingNotification = null;
+
+        function showNotification(message, type = 'info') {
+            if (!notificationContainer) return;
+            if (type === 'info') {
+                if (pendingNotification && pendingNotification.isConnected) {
+                    const t = pendingNotification.querySelector('.notification-message');
+                    if (t) t.textContent = message;
+                    pendingNotification.setAttribute('aria-busy', 'true');
+                    if (!pendingNotification.querySelector('.notification-spinner')) {
+                        const succ = pendingNotification.querySelector('.notification-icon-success');
+                        const err = pendingNotification.querySelector('.notification-icon-error');
+                        if (succ) succ.remove();
+                        if (err) err.remove();
+                        const spinner = document.createElement('span');
+                        spinner.className = 'notification-spinner';
+                        pendingNotification.insertBefore(spinner, t);
+                    }
+                    return;
+                }
+                const wrapper = document.createElement('div');
+                wrapper.className = 'notification notification-info';
+                wrapper.setAttribute('aria-busy', 'true');
+                const spinner = document.createElement('span');
+                spinner.className = 'notification-spinner';
+                const text = document.createElement('div');
+                text.className = 'notification-message';
+                text.textContent = message;
+                const close = document.createElement('button');
+                close.className = 'notification-close';
+                close.textContent = '×';
+                close.onclick = () => {
+                    wrapper.classList.remove('notification-show');
+                    setTimeout(() => wrapper.remove(), 200);
+                    if (pendingNotification === wrapper) pendingNotification = null;
+                };
+                wrapper.appendChild(spinner);
+                wrapper.appendChild(text);
+                wrapper.appendChild(close);
+                notificationContainer.appendChild(wrapper);
+                requestAnimationFrame(() => wrapper.classList.add('notification-show'));
+                pendingNotification = wrapper;
+                return;
+            }
+            let wrapper = pendingNotification;
+            let textEl;
+            if (wrapper && wrapper.isConnected) {
+                wrapper.className = `notification notification-${type}`;
+                wrapper.setAttribute('aria-busy', 'false');
+                const sp = wrapper.querySelector('.notification-spinner');
+                if (sp) sp.remove();
+                textEl = wrapper.querySelector('.notification-message');
+                if (textEl) textEl.textContent = message;
+                let leading;
+                if (type === 'success') {
+                    leading = document.createElement('span');
+                    leading.className = 'notification-icon notification-icon-success';
+                    leading.innerHTML = '<svg viewBox="0 0 16 16"><path d="M13.485 1.929a1 1 0 0 1 1.415 1.414l-8 8a1 1 0 0 1-1.414 0l-3-3A1 1 0 0 1 3.9 7.929l2.293 2.293 7.292-7.293z"/></svg>';
+                } else {
+                    leading = document.createElement('span');
+                    leading.className = 'notification-icon notification-icon-error';
+                    leading.innerHTML = '<svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 3a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>';
+                }
+                wrapper.insertBefore(leading, textEl);
+                wrapper.classList.add('notification-show');
+            } else {
+                wrapper = document.createElement('div');
+                wrapper.className = `notification notification-${type}`;
+                wrapper.setAttribute('aria-busy', 'false');
+                let leading;
+                if (type === 'success') {
+                    leading = document.createElement('span');
+                    leading.className = 'notification-icon notification-icon-success';
+                    leading.innerHTML = '<svg viewBox="0 0 16 16"><path d="M13.485 1.929a1 1 0 0 1 1.415 1.414l-8 8a1 1 0 0 1-1.414 0l-3-3A1 1 0 0 1 3.9 7.929l2.293 2.293 7.292-7.293z"/></svg>';
+                } else {
+                    leading = document.createElement('span');
+                    leading.className = 'notification-icon notification-icon-error';
+                    leading.innerHTML = '<svg viewBox="0 0 16 16"><path d="M8 1a7 7 0 1 1 0 14A7 7 0 0 1 8 1zm0 3a.75.75 0 0 1 .75.75v4.5a.75.75 0 0 1-1.5 0v-4.5A.75.75 0 0 1 8 4zm0 8a1 1 0 1 0 0-2 1 1 0 0 0 0 2z"/></svg>';
+                }
+                const text = document.createElement('div');
+                text.className = 'notification-message';
+                text.textContent = message;
+                const close = document.createElement('button');
+                close.className = 'notification-close';
+                close.textContent = '×';
+                close.onclick = () => {
+                    wrapper.classList.remove('notification-show');
+                    setTimeout(() => wrapper.remove(), 200);
+                };
+                wrapper.appendChild(leading);
+                wrapper.appendChild(text);
+                wrapper.appendChild(close);
+                notificationContainer.appendChild(wrapper);
+                requestAnimationFrame(() => wrapper.classList.add('notification-show'));
+            }
+            setTimeout(() => {
+                if (!wrapper.isConnected) return;
+                wrapper.classList.remove('notification-show');
+                setTimeout(() => {
+                    if (wrapper.isConnected) wrapper.remove();
+                }, 200);
+                pendingNotification = null;
+            }, 2600);
+        }
+
+        function activateMod(el, mod) {
+            const messages = {
+                hdr: 'Applying Ultra HDR 120FPS preset...',
+                hdr120: 'Applying HDR 120FPS preset...',
+                hdr60: 'Applying HDR 60FPS preset...',
+                hdr90: 'Applying HDR 90FPS preset...',
+                superSmooth120: 'Applying Super Smooth 120FPS preset...',
+                other: 'Applying Smooth 120FPS preset...',
+                balanced120: 'Applying Balanced 120FPS preset...',
+                ultrahdr60: 'Applying Ultra HDR 60FPS preset...',
+                ultrahdr90: 'Applying Ultra HDR 90FPS preset...',
+                ultrahdr120: 'Applying Ultra HDR 120FPS preset...'
+            };
+            const message = messages[mod] || `Mod "${mod.toUpperCase()}" has been activated.`;
+            showNotification(message, 'info');
+            const codeMap = {
+                hdr: 'NX_HDR_120',
+                hdr120: 'NX_HDR_120',
+                hdr60: 'NX_HDR_60',
+                hdr90: 'NX_HDR_90',
+                superSmooth120: 'NX_SUPER_SMOOTH_120',
+                other: 'NX_SMOOTH_120',
+                balanced120: 'NX_BALANCED_120',
+                ultrahdr60: 'NX_ULTRAHDR_60',
+                ultrahdr90: 'NX_ULTRAHDR_90',
+                ultrahdr120: 'NX_ULTRAHDR_120'
+            };
+            const cmdMap = {
+                hdr: 'HDR_120',
+                hdr120: 'HDR_120',
+                hdr60: 'HDR_60',
+                hdr90: 'HDR_90',
+                superSmooth120: 'SUPER_SMOOTH_120',
+                other: 'SMOOTH_120',
+                balanced120: 'BALANCED_120',
+                ultrahdr60: 'ULTRAHDR_60',
+                ultrahdr90: 'ULTRAHDR_90',
+                ultrahdr120: 'ULTRAHDR_120'
+            };
+            const code = el && el.dataset ? el.dataset.code : (codeMap[mod] || 'NX_MOD');
+            const command = el && el.dataset ? el.dataset.command : (cmdMap[mod] || 'MOD');
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('activateMod', { mod, code, command, args });
+        }
+
+        function startGame(el) {
+            showNotification('Launching PUBG with your current mod profile...', 'info');
+            const code = el && el.dataset ? el.dataset.code : 'NX_LAUNCH_GAME';
+            const command = el && el.dataset ? el.dataset.command : 'LAUNCH_GAME';
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('startGame', { code, command, args });
+        }
+
+        function startEmulator(el) {
+            showNotification('Starting emulator instance...', 'info');
+            const code = el && el.dataset ? el.dataset.code : 'NX_LAUNCH_EMULATOR';
+            const command = el && el.dataset ? el.dataset.command : 'LAUNCH_EMULATOR';
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('startEmulator', { code, command, args });
+        }
+
+        function killEmulator(el) {
+            showNotification('Stopping emulator process...', 'info');
+            const code = el && el.dataset ? el.dataset.code : 'NX_STOP_EMULATOR';
+            const command = el && el.dataset ? el.dataset.command : 'STOP_EMULATOR';
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('killEmulator', { code, command, args });
+        }
+
+        function runOptimizerAction(el, action) {
+            const table = {
+                fullClean: { msg: 'Running full clean...', code: 'NX_FULL_CLEAN', command: 'FULL_CLEAN' },
+                cleanShaderCache: { msg: 'Cleaning shader cache...', code: 'NX_CLEAN_SHADERCACHE', command: 'CLEAN_SHADERCACHE' },
+                cleanCache: { msg: 'Cleaning cache...', code: 'NX_CLEAN_CACHE', command: 'CLEAN_CACHE' },
+                cleanGameLoop: { msg: 'Cleaning GameLoop files...', code: 'NX_CLEAN_GAMELOOP', command: 'CLEAN_GAMELOOP' },
+                ipFlush: { msg: 'Flushing IP stack...', code: 'NX_IP_FLUSH', command: 'IP_FLUSH' },
+                clearTemp: { msg: 'Clearing temp files...', code: 'NX_CLEAR_TEMP', command: 'CLEAR_TEMP' },
+                boostLatency: { msg: 'Boosting latency profile...', code: 'NX_BOOST_LATENCY', command: 'BOOST_LATENCY' },
+
+                boostGameLoop: { msg: 'Boosting GameLoop performance...', code: 'NX_BOOST_GAMELOOP', command: 'BOOST_GAMELOOP' },
+                boostPerformance: { msg: 'Applying boost performance profile...', code: 'NX_BOOST_PERFORMANCE', command: 'BOOST_PERFORMANCE' },
+                boostStability: { msg: 'Applying boost stability profile...', code: 'NX_BOOST_STABILITY', command: 'BOOST_STABILITY' },
+                maxPerformance: { msg: 'Applying max performance profile...', code: 'NX_MAX_PERFORMANCE', command: 'MAX_PERFORMANCE' },
+                nvidiaControlPanel: { msg: 'Opening NVIDIA Control Panel...', code: 'NX_NVIDIA_CONTROL_PANEL', command: 'NVIDIA_CONTROL_PANEL' },
+                nxTimeCommend: { msg: 'Applying NX time commend...', code: 'NX_TIME_COMMEND', command: 'NX_TIME_COMMEND' },
+                serviceDebloater: { msg: 'Running service debloater...', code: 'NX_SERVICE_DEBLOATER', command: 'SERVICE_DEBLOATER' },
+                debloatWithMicrosoft: { msg: 'Running full debloat (with Microsoft)...', code: 'NX_FULL_DEBLOAT_WITH_MICROSOFT', command: 'FULL_DEBLOAT_WITH_MICROSOFT' },
+                debloatWithoutMicrosoft: { msg: 'Running full debloat (without Microsoft)...', code: 'NX_FULL_DEBLOAT_WITHOUT_MICROSOFT', command: 'FULL_DEBLOAT_WITHOUT_MICROSOFT' },
+                nxTimerResolution: { msg: 'Applying NX timer resolution...', code: 'NX_TIMER_RESOLUTION', command: 'NX_TIMER_RESOLUTION' },
+                applyModel: { msg: 'Applying GameLoop Model...', code: 'NX_APPLY_MODEL', command: 'APPLY_MODEL' },
+                applySettings: { msg: 'Applying GameLoop Settings...', code: 'NX_APPLY_SETTINGS', command: 'APPLY_SETTINGS' }
+            };
+
+            const t = table[action];
+            if (!t) return;
+            showNotification(t.msg, 'info');
+            const code = el && el.dataset && el.dataset.code ? el.dataset.code : t.code;
+            const command = el && el.dataset && el.dataset.command ? el.dataset.command : t.command;
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('optimizerAction', { action, code, command, args });
+        }
+
+        // ── Recovery actions ─────────────────────────────────────────────
+        function runRecoveryAction(el, action) {
+            const table = {
+                copyPaks: { msg: 'Select a Paks file to copy to GameLoop temp...', code: 'NX_COPY_PAKS', command: 'COPY_PAKS' },
+                selectPaksFolder: { msg: 'Select the Paks folder to copy to GameLoop temp...', code: 'NX_SELECT_PAKS_FOLDER', command: 'SELECT_PAKS_FOLDER' },
+                applyRecovery: { msg: 'Applying recovery — copying Paks folder to game...', code: 'NX_APPLY_RECOVERY', command: 'APPLY_RECOVERY' },
+                copySens: { msg: 'Copying Sensitivity from game...', code: 'NX_COPY_SENS', command: 'COPY_SENS' },
+                selectSens: { msg: 'Select Sensitivity folder...', code: 'NX_SELECT_SENS', command: 'SELECT_SENS' },
+                applySens: { msg: 'Applying Sensitivity to game...', code: 'NX_APPLY_SENS', command: 'APPLY_SENS' }
+            };
+
+
+            const t = table[action];
+            if (!t) return;
+            showNotification(t.msg, 'info');
+            const code = (el && el.dataset && el.dataset.code) ? el.dataset.code : t.code;
+            const command = (el && el.dataset && el.dataset.command) ? el.dataset.command : t.command;
+            const args = parseArgs(el && el.dataset ? el.dataset.args : '');
+            sendToHost('recoveryAction', { action, code, command, args });
+        }
+
+        const hasHost = !!(window.chrome && window.chrome.webview);
+        function parseArgs(s) {
+            const out = {};
+            if (!s) return out;
+            String(s).split(';').forEach(p => {
+                const [k, v] = p.split('=');
+                if (k) out[k.trim()] = (v || '').trim();
+            });
+            return out;
+        }
+        function sendToHost(type, payload = {}) {
+            try {
+                if (hasHost) {
+                    window.chrome.webview.postMessage({ type, payload });
+                } else if (window.external && typeof window.external.InvokeMethod === 'function') {
+                    window.external.InvokeMethod(JSON.stringify({ type, payload }));
+                }
+            } catch (_) { }
+        }
+        function handleHostMessage(data) {
+            const d = data || {};
+            switch (d.type) {
+                case 'showNotification':
+                    if (d.payload && d.payload.message) {
+                        showNotification(d.payload.message, d.payload.kind || 'info');
+                    }
+                    break;
+                case 'enterDashboard':
+                    enterDashboard();
+                    break;
+                case 'setDashboardPage':
+                    if (d.payload && d.payload.page) {
+                        setDashboardPage(d.payload.page, { notifyHost: false });
+                    }
+                    break;
+                case 'activateMod':
+                    if (d.payload && d.payload.mod) activateMod(null, String(d.payload.mod));
+                    break;
+                case 'startGame':
+                    startGame();
+                    break;
+                case 'startEmulator':
+                    startEmulator();
+                    break;
+                case 'killEmulator':
+                    killEmulator();
+                    break;
+                case 'runOptimizer':
+                    if (d.payload && d.payload.action) runOptimizerAction(null, String(d.payload.action));
+                    break;
+                case 'click':
+                    if (d.payload && d.payload.id) {
+                        const el = document.getElementById(String(d.payload.id));
+                        if (el && typeof el.click === 'function') el.click();
+                    }
+                    break;
+                case 'exec':
+                    if (d.payload && d.payload.command) {
+                        const c = String(d.payload.command);
+                        switch (c) {
+                            case 'ENTER_DASHBOARD': enterDashboard(); break;
+                            case 'HDR_120': activateMod(null, 'hdr'); break;
+                            case 'HDR_60': activateMod(null, 'hdr60'); break;
+                            case 'SUPER_SMOOTH_120': activateMod(null, 'superSmooth120'); break;
+                            case 'SMOOTH_120': activateMod(null, 'other'); break;
+                            case 'LAUNCH_EMULATOR': startEmulator(); break;
+                            case 'LAUNCH_GAME': startGame(); break;
+                            case 'STOP_EMULATOR': killEmulator(); break;
+                            case 'FULL_CLEAN': runOptimizerAction(null, 'fullClean'); break;
+                            case 'CLEAN_SHADERCACHE': runOptimizerAction(null, 'cleanShaderCache'); break;
+                            case 'CLEAN_CACHE': runOptimizerAction(null, 'cleanCache'); break;
+                            case 'CLEAN_GAMELOOP': runOptimizerAction(null, 'cleanGameLoop'); break;
+                            case 'BOOST_LATENCY': runOptimizerAction(null, 'boostLatency'); break;
+
+                            case 'BOOST_GAMELOOP': runOptimizerAction(null, 'boostGameLoop'); break;
+                            case 'BOOST_PERFORMANCE': runOptimizerAction(null, 'boostPerformance'); break;
+                            case 'BOOST_STABILITY': runOptimizerAction(null, 'boostStability'); break;
+                            case 'MAX_PERFORMANCE': runOptimizerAction(null, 'maxPerformance'); break;
+                            case 'NVIDIA_CONTROL_PANEL': runOptimizerAction(null, 'nvidiaControlPanel'); break;
+                            case 'NX_TIME_COMMEND': runOptimizerAction(null, 'nxTimeCommend'); break;
+                            case 'SERVICE_DEBLOATER': runOptimizerAction(null, 'serviceDebloater'); break;
+                            case 'IP_FLUSH': runOptimizerAction(null, 'ipFlush'); break;
+                            case 'CLEAR_TEMP': runOptimizerAction(null, 'clearTemp'); break;
+                            case 'FULL_DEBLOAT_WITH_MICROSOFT': runOptimizerAction(null, 'debloatWithMicrosoft'); break;
+                            case 'FULL_DEBLOAT_WITHOUT_MICROSOFT': runOptimizerAction(null, 'debloatWithoutMicrosoft'); break;
+                            case 'NX_TIMER_RESOLUTION': runOptimizerAction(null, 'nxTimerResolution'); break;
+                            case 'COPY_PAKS': runRecoveryAction(null, 'copyPaks'); break;
+                            case 'SELECT_PAKS_FOLDER': runRecoveryAction(null, 'selectPaksFolder'); break;
+                            case 'APPLY_RECOVERY': runRecoveryAction(null, 'applyRecovery'); break;
+                            case 'COPY_SENS': runRecoveryAction(null, 'copySens'); break;
+                            case 'SELECT_SENS': runRecoveryAction(null, 'selectSens'); break;
+                            case 'APPLY_SENS': runRecoveryAction(null, 'applySens'); break;
+                            case 'APPLY_MODEL': runOptimizerAction(null, 'applyModel'); break;
+                            case 'APPLY_SETTINGS': runOptimizerAction(null, 'applySettings'); break;
+
+                            default: break;
+                        }
+                    }
+                    break;
+                case 'setStyle':
+                    document.body.classList.add('theme-minimal');
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (hasHost) {
+            window.chrome.webview.addEventListener('message', e => handleHostMessage(e.data));
+            window.chrome.webview.postMessage({
+                type: 'ready',
+                payload: {
+                    code: 'NX_READY',
+                    command: 'READY',
+                    version: '1.0',
+                    title: 'NX TWEAKER',
+                    features: ['mods', 'controls', 'notifications', 'welcome', 'dashboardPages', 'clean', 'optimize', 'debloat', 'boost', 'graphics', 'optimizer', 'optimizerClean', 'optimizerOptimize', 'recovery']
+                }
+            });
+        }
+
+        document.querySelectorAll('a.social-link').forEach(a => {
+            a.setAttribute('target', '_blank');
+            a.setAttribute('rel', 'noopener noreferrer');
+            a.addEventListener('click', e => {
+                const href = a.getAttribute('href');
+                if (!href || href === '#') return;
+                if (hasHost) {
+                    e.preventDefault();
+                    sendToHost('openExternal', { href });
+                }
+            });
+        });
+
+    </script>
+</body>
+
+</html>
